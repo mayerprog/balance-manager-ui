@@ -42,45 +42,48 @@ function App() {
               <td>{user.email}</td>
               <td>{"0.00"}</td>
               <td>
-                <input
-                  type="number"
-                  value={amount}
-                  onChange={(e) => setAmount(e.target.value)}
-                  placeholder="Amount"
-                />
+                <div className="flex-container">
+                  <input
+                    type="number"
+                    value={amount}
+                    onChange={(e) => setAmount(e.target.value)}
+                    placeholder="Amount"
+                  />
+                  <button onClick={() => handleAction("Transfer")}>
+                    Deposit
+                  </button>
+                </div>
               </td>
               <td>
-                <input
-                  type="number"
-                  value={amount}
-                  onChange={(e) => setAmount(e.target.value)}
-                  placeholder="Amount"
-                />
+                <div className="flex-container">
+                  <input
+                    type="number"
+                    value={amount}
+                    onChange={(e) => setAmount(e.target.value)}
+                    placeholder="Amount"
+                  />
+                  <button onClick={() => handleAction("Transfer")}>
+                    Withdraw
+                  </button>
+                </div>
               </td>
               <td>
-                <input
-                  type="number"
-                  value={amount}
-                  onChange={(e) => setAmount(e.target.value)}
-                  placeholder="Amount"
-                />
+                <div className="flex-container">
+                  <input
+                    type="number"
+                    value={userId}
+                    onChange={(e) => setUserId(e.target.value)}
+                    placeholder="UserId"
+                  />
+                  <button onClick={() => handleAction("Transfer")}>
+                    Transfer
+                  </button>
+                </div>
               </td>
             </tr>
           ))}
         </tbody>
       </table>
-
-      <div className="action-form">
-        <input
-          type="number"
-          value={amount}
-          onChange={(e) => setAmount(e.target.value)}
-          placeholder="Amount"
-        />
-        <button onClick={() => handleAction("Deposit")}>Deposit</button>
-        <button onClick={() => handleAction("Withdraw")}>Withdraw</button>
-        <button onClick={() => handleAction("Transfer")}>Transfer</button>
-      </div>
     </div>
   );
 }

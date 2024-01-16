@@ -18,23 +18,21 @@
   background-color: #f2f2f2;
 }
 
-.action-form {
-  margin-top: 20px;
+.flex-container {
+  display: flex;
+  flex-direction: column; 
+  align-items: flex-start; 
 }
 
-.action-form input, 
-.action-form button {
-  margin: 5px;
-  padding: 10px;
-}
-
-button {
+.flex-container button {
+  margin-top: 10px; 
   background-color: #4CAF50;
   color: white;
   border: none;
   cursor: pointer;
 }
 
-button:hover {
+.flex-container button:hover {
   background-color: #45a049;
 }
+
