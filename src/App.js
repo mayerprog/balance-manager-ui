@@ -5,14 +5,20 @@ import { balanceAPI } from "./api/balanceAPI";
 
 function App() {
   const [users, setUsers] = useState([]);
-  const [userId, setUserId] = useState("");
-  const [amount, setAmount] = useState("");
+  const [usersData, setUsersData] = useState({});
 
   const handleAction = (actionType) => {
-    console.log(
-      `Action: ${actionType} | User ID: ${userId} | Amount: ${amount}`
-    );
     // Добавьте здесь логику обработки действий
+  };
+
+  const handleInputChange = (userId, field, value) => {
+    setUsersData({
+      ...usersData,
+      [userId]: {
+        ...usersData[userId],
+        [field]: value,
+      },
+    });
   };
 
   useEffect(() => {
@@ -26,8 +32,16 @@ function App() {
             return { ...user, balance };
           })
         );
-
-        console.log("Users with balances", usersWithBalances);
+        const initialUserData = {};
+        allUsers.forEach((user) => {
+          initialUserData[user.id] = {
+            depositAmount: "",
+            withdrawAmount: "",
+            transferAmount: "",
+            toUserId: "",
+          };
+        });
+        setUsersData(initialUserData);
         setUsers(usersWithBalances);
       } catch (err) {
         console.log(err);
@@ -62,9 +76,16 @@ function App() {
                 <div className="flex-container">
                   <input
                     type="number"
-                    value={amount}
-                    onChange={(e) => setAmount(e.target.value)}
+                    value={usersData[user.id]?.depositAmount || ""}
+                    onChange={(e) =>
+                      handleInputChange(
+                        user.id,
+                        "depositAmount",
+                        e.target.value
+                      )
+                    }
                     placeholder="Amount"
+                    min="0"
                   />
                   <button onClick={() => handleAction("Transfer")}>
                     Deposit
@@ -75,9 +96,16 @@ function App() {
                 <div className="flex-container">
                   <input
                     type="number"
-                    value={amount}
-                    onChange={(e) => setAmount(e.target.value)}
+                    value={usersData[user.id]?.withdrawAmount || ""}
+                    onChange={(e) =>
+                      handleInputChange(
+                        user.id,
+                        "withdrawAmount",
+                        e.target.value
+                      )
+                    }
                     placeholder="Amount"
+                    min="0"
                   />
                   <button onClick={() => handleAction("Transfer")}>
                     Withdraw
@@ -88,9 +116,25 @@ function App() {
                 <div className="flex-container">
                   <input
                     type="number"
-                    value={userId}
-                    onChange={(e) => setUserId(e.target.value)}
-                    placeholder="UserId"
+                    value={usersData[user.id]?.toUserId || ""}
+                    onChange={(e) =>
+                      handleInputChange(user.id, "toUserId", e.target.value)
+                    }
+                    placeholder="User Id"
+                    min="0"
+                  />
+                  <input
+                    type="number"
+                    value={usersData[user.id]?.transferAmount || ""}
+                    onChange={(e) =>
+                      handleInputChange(
+                        user.id,
+                        "transferAmount",
+                        e.target.value
+                      )
+                    }
+                    placeholder="Amount"
+                    min="0"
                   />
                   <button onClick={() => handleAction("Transfer")}>
                     Transfer
