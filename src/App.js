@@ -1,13 +1,10 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import "./App.css"; // Импортируйте CSS файл для стилей
+import { usersAPI } from "./api/usersAPI";
+import { balanceAPI } from "./api/balanceAPI";
 
 function App() {
-  const users = [
-    { id: 1, name: "Alexey Ivanov", email: "alexey.ivanov@example.com" },
-    { id: 2, name: "Maria Sidorova", email: "maria.sidorova@example.com" },
-    { id: 3, name: "Ivan Petrov", email: "ivan.petrov@example.com" },
-  ];
-
+  const [users, setUsers] = useState([]);
   const [userId, setUserId] = useState("");
   const [amount, setAmount] = useState("");
 
@@ -17,6 +14,26 @@ function App() {
     );
     // Добавьте здесь логику обработки действий
   };
+
+  useEffect(() => {
+    (async () => {
+      try {
+        const allUsers = await usersAPI.getUsers();
+
+        const usersWithBalances = await Promise.all(
+          allUsers.map(async (user) => {
+            const balance = await balanceAPI.getBalance(user.id);
+            return { ...user, balance };
+          })
+        );
+
+        console.log("Users with balances", usersWithBalances);
+        setUsers(usersWithBalances);
+      } catch (err) {
+        console.log(err);
+      }
+    })();
+  }, []);
 
   return (
     <div className="App">
@@ -40,7 +57,7 @@ function App() {
               <td>{user.id}</td>
               <td>{user.name}</td>
               <td>{user.email}</td>
-              <td>{"0.00"}</td>
+              <td>{user.balance || "0.00"}</td>
               <td>
                 <div className="flex-container">
                   <input
