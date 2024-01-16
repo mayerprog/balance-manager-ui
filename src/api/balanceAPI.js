@@ -17,4 +17,26 @@ export const balanceAPI = {
       alert(err);
     }
   },
+  async updateBalance(id, amount) {
+    try {
+      const response = await instance.post(`/updateBalance/${id}`, {
+        amount: amount,
+      });
+      return response.data;
+    } catch (err) {
+      alert(err);
+    }
+  },
+  async transferFunds(fromUserId, toUserId, amount) {
+    try {
+      const response = await instance.post(`/transferFunds`, {
+        fromUserId: fromUserId,
+        toUserId: toUserId,
+        amount: amount,
+      });
+      return response.data;
+    } catch (err) {
+      alert(err);
+    }
+  },
 };

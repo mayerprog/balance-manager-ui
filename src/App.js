@@ -7,8 +7,43 @@ function App() {
   const [users, setUsers] = useState([]);
   const [usersData, setUsersData] = useState({});
 
-  const handleAction = (actionType) => {
-    // Добавьте здесь логику обработки действий
+  async function fetchUsersWithBalances() {
+    try {
+      const allUsers = await usersAPI.getUsers();
+
+      const usersWithBalances = await Promise.all(
+        allUsers.map(async (user) => {
+          const balance = await balanceAPI.getBalance(user.id);
+          return { ...user, balance };
+        })
+      );
+
+      setUsers(usersWithBalances);
+    } catch (err) {
+      console.error(err);
+    }
+  }
+
+  const handleAction = async (actionType, userId, amount, toUserId) => {
+    console.log("toUserId", toUserId);
+    try {
+      switch (actionType) {
+        case "Deposit":
+          await balanceAPI.updateBalance(userId, amount);
+          break;
+        case "Withdraw":
+          await balanceAPI.updateBalance(userId, -amount);
+          break;
+        case "Transfer":
+          await balanceAPI.transferFunds(userId, toUserId, amount);
+          break;
+        default:
+          return;
+      }
+      await fetchUsersWithBalances();
+    } catch (err) {
+      console.error(err);
+    }
   };
 
   const handleInputChange = (userId, field, value) => {
@@ -24,14 +59,10 @@ function App() {
   useEffect(() => {
     (async () => {
       try {
+        await fetchUsersWithBalances();
+
         const allUsers = await usersAPI.getUsers();
 
-        const usersWithBalances = await Promise.all(
-          allUsers.map(async (user) => {
-            const balance = await balanceAPI.getBalance(user.id);
-            return { ...user, balance };
-          })
-        );
         const initialUserData = {};
         allUsers.forEach((user) => {
           initialUserData[user.id] = {
@@ -42,7 +73,6 @@ function App() {
           };
         });
         setUsersData(initialUserData);
-        setUsers(usersWithBalances);
       } catch (err) {
         console.log(err);
       }
@@ -87,7 +117,15 @@ function App() {
                     placeholder="Amount"
                     min="0"
                   />
-                  <button onClick={() => handleAction("Transfer")}>
+                  <button
+                    onClick={() =>
+                      handleAction(
+                        "Deposit",
+                        user.id,
+                        usersData[user.id].depositAmount
+                      )
+                    }
+                  >
                     Deposit
                   </button>
                 </div>
@@ -107,7 +145,15 @@ function App() {
                     placeholder="Amount"
                     min="0"
                   />
-                  <button onClick={() => handleAction("Transfer")}>
+                  <button
+                    onClick={() =>
+                      handleAction(
+                        "Withdraw",
+                        user.id,
+                        usersData[user.id].withdrawAmount
+                      )
+                    }
+                  >
                     Withdraw
                   </button>
                 </div>
@@ -136,7 +182,16 @@ function App() {
                     placeholder="Amount"
                     min="0"
                   />
-                  <button onClick={() => handleAction("Transfer")}>
+                  <button
+                    onClick={() =>
+                      handleAction(
+                        "Transfer",
+                        user.id,
+                        usersData[user.id].transferAmount,
+                        usersData[user.id].toUserId
+                      )
+                    }
+                  >
                     Transfer
                   </button>
                 </div>
