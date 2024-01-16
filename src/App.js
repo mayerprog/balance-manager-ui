@@ -26,6 +26,9 @@ function App() {
 
   const handleAction = async (actionType, userId, amount, toUserId) => {
     console.log("toUserId", toUserId);
+    if (amount[0] === "-") {
+      alert("amount should be positive");
+    }
     try {
       switch (actionType) {
         case "Deposit":
