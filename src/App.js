@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import "./App.css";
 import { usersAPI } from "./api/usersAPI";
 import { balanceAPI } from "./api/balanceAPI";
@@ -7,58 +7,21 @@ function App() {
   const [users, setUsers] = useState([]);
   const [usersData, setUsersData] = useState({});
 
-  async function fetchUsersWithBalances() {
+  const fetchUsersWithBalances = useCallback(async () => {
     try {
       const allUsers = await usersAPI.getUsers();
-
       const usersWithBalances = await Promise.all(
         allUsers.map(async (user) => {
           const balance = await balanceAPI.getBalance(user.id);
           return { ...user, balance };
         })
       );
-
       setUsers(usersWithBalances);
       return allUsers;
     } catch (err) {
       console.error(err);
     }
-  }
-
-  const handleAction = async (actionType, userId, amount, toUserId) => {
-    if (amount[0] === "-") {
-      alert("amount should be positive");
-      return;
-    }
-    try {
-      switch (actionType) {
-        case "Deposit":
-          await balanceAPI.updateBalance(userId, amount);
-          break;
-        case "Withdraw":
-          await balanceAPI.updateBalance(userId, -amount);
-          break;
-        case "Transfer":
-          await balanceAPI.transferFunds(userId, toUserId, amount);
-          break;
-        default:
-          return;
-      }
-      await fetchUsersWithBalances();
-    } catch (err) {
-      console.error(err);
-    }
-  };
-
-  const handleInputChange = (userId, field, value) => {
-    setUsersData({
-      ...usersData,
-      [userId]: {
-        ...usersData[userId],
-        [field]: value,
-      },
-    });
-  };
+  }, []);
 
   useEffect(() => {
     (async () => {
@@ -79,7 +42,64 @@ function App() {
         console.log(err);
       }
     })();
-  }, []);
+  }, [fetchUsersWithBalances]);
+
+  const isValidAmount = (amount) => !isNaN(amount) && Number(amount) > 0;
+  const canPerformAction = (userId, actionType) => {
+    const userData = usersData[userId];
+    if (!userData) return false;
+
+    switch (actionType) {
+      case "Deposit":
+      case "Withdraw":
+        return isValidAmount(userData[`${actionType.toLowerCase()}Amount`]);
+      case "Transfer":
+        return (
+          isValidAmount(userData.transferAmount) &&
+          userData.toUserId &&
+          userData.toUserId !== userId
+        );
+      default:
+        return false;
+    }
+  };
+
+  const handleAction = async (actionType, userId, amount, toUserId) => {
+    if (!canPerformAction(userId, actionType)) {
+      alert("Invalid input");
+      return;
+    }
+
+    try {
+      switch (actionType) {
+        case "Deposit":
+          await balanceAPI.updateBalance(userId, amount);
+          break;
+        case "Withdraw":
+          await balanceAPI.updateBalance(userId, -amount);
+          break;
+        case "Transfer":
+          await balanceAPI.transferFunds(userId, toUserId, amount);
+          break;
+        default:
+          return;
+      }
+      await fetchUsersWithBalances();
+    } catch (err) {
+      console.error(err);
+      alert("Operation failed. Please try again.");
+    }
+  };
+
+  const handleInputChange = (userId, field, value) => {
+    setUsersData({
+      ...usersData,
+      [userId]: {
+        ...usersData[userId],
+        [field]: value,
+      },
+    });
+  };
 
   return (
     <div className="App">
@@ -130,6 +150,7 @@ function App() {
                         usersData[user.id].depositAmount
                       )
                     }
+                    disabled={!canPerformAction(user.id, "Deposit")}
                   >
                     Deposit
                   </button>
@@ -158,6 +179,7 @@ function App() {
                         usersData[user.id].withdrawAmount
                       )
                     }
+                    disabled={!canPerformAction(user.id, "Withdraw")}
                   >
                     Withdraw
                   </button>
@@ -196,6 +218,7 @@ function App() {
                         usersData[user.id].toUserId
                       )
                     }
+                    disabled={!canPerformAction(user.id, "Transfer")}
                   >
                     Transfer
                   </button>
