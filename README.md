@@ -23,6 +23,11 @@ In the file config.js put IP address and port that the server `balance-manager-a
 
 You can find my [server code here](https://github.com/mayerprog/balance-manager-api)
 
+## Tecnologies
+
+- Javascript
+- React
+
 ## Contacts
 
 <p>Mayra Tulegenova</p>
