@@ -11,7 +11,7 @@ To run this web app you need (if not installed yet):
 
 Then:
 
-- If you clone the project from GitHub, use the command `git clone https://github.com/mayerprog/balance-manager-ui`
+- Clone the repository with `git clone https://github.com/mayerprog/balance-manager-ui`
 - Install dependencies `yarn install`
 - Run `yarn start` to run the project
 
