@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import "./App.css"; // Импортируйте CSS файл для стилей
+import "./App.css";
 import { usersAPI } from "./api/usersAPI";
 import { balanceAPI } from "./api/balanceAPI";
 
@@ -19,13 +19,13 @@ function App() {
       );
 
       setUsers(usersWithBalances);
+      return allUsers;
     } catch (err) {
       console.error(err);
     }
   }
 
   const handleAction = async (actionType, userId, amount, toUserId) => {
-    console.log("toUserId", toUserId);
     if (amount[0] === "-") {
       alert("amount should be positive");
       return;
@@ -63,9 +63,7 @@ function App() {
   useEffect(() => {
     (async () => {
       try {
-        await fetchUsersWithBalances();
-
-        const allUsers = await usersAPI.getUsers();
+        const allUsers = await fetchUsersWithBalances();
 
         const initialUserData = {};
         allUsers.forEach((user) => {
@@ -105,7 +103,10 @@ function App() {
               <td>{user.id}</td>
               <td>{user.name}</td>
               <td>{user.email}</td>
-              <td>{user.balance || "0.00"}</td>
+              <td>
+                <div>{user.balance || "0.00"}</div>
+                <div>rub.</div>
+              </td>
               <td>
                 <div className="flex-container">
                   <input
