@@ -28,6 +28,7 @@ function App() {
     console.log("toUserId", toUserId);
     if (amount[0] === "-") {
       alert("amount should be positive");
+      return;
     }
     try {
       switch (actionType) {
